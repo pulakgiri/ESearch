@@ -49,6 +49,7 @@ dependencies:
   csc_picker: ^0.2.7
   get: ^4.7.2
   provider: ^6.1.2
+  sqflite: ^2.0.0+4
   flutter:
     sdk: flutter
 
@@ -57,6 +58,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   fluttertoast: ^8.2.12
   lottie: ^3.3.1
+  intl: ^0.20.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

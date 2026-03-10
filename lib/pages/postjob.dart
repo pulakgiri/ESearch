@@ -45,9 +45,9 @@ class _PostJobPageState extends State<PostJobPage> {
           );
         },
       );
-    } else if (type == "Home-Based Job") {
+    } else if (type == "Domestic Services") {
       return _navigateCard(
-        title: "Post Home-Based Job",
+        title: "Domestic Survice",
         onTap: () {
           Navigator.push(
             context,
@@ -59,7 +59,7 @@ class _PostJobPageState extends State<PostJobPage> {
       );
     } else {
       return _navigateCard(
-        title: "Post Skille job",
+        title: "Skilled Labour",
         onTap: () {
           Navigator.push(
             context,

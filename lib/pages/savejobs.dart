@@ -1,6 +1,9 @@
 import 'package:esearch/util/color.dart';
 import 'package:flutter/material.dart';
 
+import '../models/saved_job.dart';
+import '../util/database_helper.dart';
+
 class SavedJobs extends StatefulWidget {
   const SavedJobs({super.key});
 
@@ -9,25 +12,21 @@ class SavedJobs extends StatefulWidget {
 }
 
 class _SavedJobsState extends State<SavedJobs> {
-  // Dummy saved jobs list
-  final List<Map<String, String>> savedJobs = [
-    {
-      "title": "Electrician",
-      "company": "HomeFix Services",
-      "salary": "₹ 15,000 - ₹ 20,000 per month",
-      "location": "Salt Lake, Kolkata",
-      "type": "Full-Time",
-      "vacancy": "10 Vacancies",
-    },
-    {
-      "title": "Home Cook",
-      "company": "Urban Helpers",
-      "salary": "₹ 12,000 - ₹ 18,000 per month",
-      "location": "Behala, Kolkata",
-      "type": "Part-Time",
-      "vacancy": "5 Vacancies",
-    },
-  ];
+  // list loaded from database
+  List<SavedJob> savedJobs = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadJobsFromDb();
+  }
+
+  Future<void> _loadJobsFromDb() async {
+    final jobs = await DatabaseHelper.instance.getSavedJobs();
+    setState(() {
+      savedJobs = jobs;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +53,7 @@ class _SavedJobsState extends State<SavedJobs> {
     );
   }
 
-  Widget _savedJobCard(Map<String, String> job, int index) {
+  Widget _savedJobCard(SavedJob job, int index) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -69,7 +68,7 @@ class _SavedJobsState extends State<SavedJobs> {
             children: [
               Expanded(
                 child: Text(
-                  job["title"] ?? "",
+                  job.title,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -78,7 +77,11 @@ class _SavedJobsState extends State<SavedJobs> {
               ),
               IconButton(
                 icon: const Icon(Icons.bookmark, color: Colors.blue),
-                onPressed: () {
+                onPressed: () async {
+                  // delete from database then remove from list
+                  if (job.id != null) {
+                    await DatabaseHelper.instance.deleteJob(job.id!);
+                  }
                   setState(() {
                     savedJobs.removeAt(index);
                   });
@@ -90,21 +93,29 @@ class _SavedJobsState extends State<SavedJobs> {
           const SizedBox(height: 4),
 
           Text(
-            job["company"] ?? "",
+            job.company,
             style: const TextStyle(color: Colors.grey),
           ),
+
+          if (job.category != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              job.category!,
+              style: const TextStyle(color: Colors.blueGrey, fontSize: 12),
+            ),
+          ],
 
           const SizedBox(height: 10),
 
           Text(
-            job["salary"] ?? "",
+            job.salary,
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
 
           const SizedBox(height: 6),
 
           Text(
-            job["location"] ?? "",
+            job.location,
             style: const TextStyle(color: Colors.grey),
           ),
 
@@ -112,9 +123,9 @@ class _SavedJobsState extends State<SavedJobs> {
 
           Row(
             children: [
-              Chip(label: Text(job["type"] ?? "")),
+              Chip(label: Text(job.type)),
               const SizedBox(width: 8),
-              Chip(label: Text(job["vacancy"] ?? "")),
+              Chip(label: Text(job.vacancy)),
             ],
           ),
         ],

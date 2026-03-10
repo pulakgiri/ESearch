@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:esearch/pages/applied_job.dart';
 import 'package:esearch/pages/corporatejobs.dart';
 import 'package:esearch/pages/domesticservices.dart';
 import 'package:esearch/pages/editprofile.dart';
@@ -57,10 +58,10 @@ class _HomeState extends State<Home> {
                 _jobTypeButton(context, "Corporate Job"),
                 const SizedBox(height: 15),
 
-                _jobTypeButton(context, "Home-Based Job"),
+                _jobTypeButton(context, "Domestic Services"),
                 const SizedBox(height: 15),
 
-                _jobTypeButton(context, "Skilled Worker"),
+                _jobTypeButton(context, "Skilled Labour"),
               ],
             ),
           ),
@@ -129,15 +130,68 @@ class _HomeState extends State<Home> {
             ),
           ),
           IconButton(
-            onPressed: () async {
-              sp = await SharedPreferences.getInstance();
-              sp.clear();
-
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                  builder: (context) => Login(),
+            onPressed: () {
+              showDialog(
+                context: context,
+                barrierDismissible: true,
+                builder: (context) => Dialog(
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "Logout",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          "Are you sure you want to logout?",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: Text(
+                                "Cancel",
+                                style: TextStyle(
+                                  color: const Color.fromARGB(255, 98, 244, 54),
+                                ),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                sp = await SharedPreferences.getInstance();
+                                sp.clear();
+                                Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                    builder: (context) => Login(),
+                                  ),
+                                  (Route<dynamic> route) => false,
+                                );
+                              },
+                              child: Text(
+                                "Logout",
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                (Route<dynamic> route) => false,
               );
             },
             icon: Icon(
@@ -212,7 +266,7 @@ class _HomeState extends State<Home> {
               ),
             ),
             SizedBox(
-              height: 120,
+              height: 150,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -313,7 +367,7 @@ class _HomeState extends State<Home> {
                         SizedBox(height: 8),
 
                         Text(
-                          "Skilled\nLabor",
+                          "Skilled\nLabour",
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Color.fromARGB(255, 30, 2, 61),
@@ -420,31 +474,47 @@ class _HomeState extends State<Home> {
                   ),
                 ),
 
-                Container(
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(150, 123, 161, 227),
-                    borderRadius: BorderRadius.circular(12),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(208, 176, 207, 255),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                    elevation: 3,
                   ),
-                  alignment: Alignment.center,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AppliedJob(),
+                      ),
+                    );
+                  },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        Icons.description,
+                        Icons.search,
                         size: 30,
-                        color: const Color.fromARGB(255, 34, 47, 230),
+                        color: const Color.fromARGB(255, 8, 20, 194),
                       ),
                       SizedBox(width: 8),
-                      Text(
-                        "Resume",
+                      AutoSizeText(
+                        "Applied Job",
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
+                          color: Colors.black,
                         ),
+                        maxLines: 2,
+                        maxFontSize: 18,
+                        minFontSize: 12,
                       ),
                     ],
                   ),
                 ),
+
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(208, 176, 207, 255),
@@ -514,46 +584,7 @@ class _HomeState extends State<Home> {
                 ),
               ],
             ),
-            Padding(
-              padding: EdgeInsets.all(6),
-              child: Text(
-                "Skills/Portfolio",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            Row(
-              spacing: Checkbox.width,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  height: 100,
-                  width: 100,
-                ),
-                Container(
-                  // height: 100,
-                  // width: 100,
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(145, 74, 113, 221),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Image.asset(
-                    "assets/images/description.png",
-                    height: 100,
-                    width: 100,
-                    color: Colors.blueAccent,
-                  ),
-                ),
-                Icon(
-                  Icons.now_wallpaper_outlined,
-                  size: 100,
-                  color: Colors.blue,
-                ),
-              ],
-            ),
+
             Padding(
               padding: EdgeInsets.all(6),
               child: Text(
