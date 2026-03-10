@@ -49,6 +49,7 @@ dependencies:
   csc_picker: ^0.2.7
   get: ^4.7.2
   provider: ^6.1.2
+  sqflite: ^2.0.0+4
   flutter:
     sdk: flutter
 

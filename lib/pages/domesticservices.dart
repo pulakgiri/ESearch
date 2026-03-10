@@ -1,6 +1,10 @@
 import 'package:esearch/util/color.dart';
 import 'package:flutter/material.dart';
 
+import '../models/saved_job.dart';
+import '../util/database_helper.dart';
+import '../widgets/job_card.dart';
+
 class DomesticServices extends StatefulWidget {
   const DomesticServices({super.key});
 
@@ -9,6 +13,44 @@ class DomesticServices extends StatefulWidget {
 }
 
 class _DomesticServicesState extends State<DomesticServices> {
+  bool _isSaved = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkSaved();
+  }
+
+  Future<void> _checkSaved() async {
+    final exists = await DatabaseHelper.instance.isJobSaved(
+      'Junior Software Engineer',
+      'Jay Balaji Enterprise',
+      category: 'Domestic',
+    );
+    setState(() {
+      _isSaved = exists;
+    });
+  }
+
+  Future<void> _saveJob() async {
+    final job = SavedJob(
+      title: 'Junior Software Engineer',
+      company: 'Jay Balaji Enterprise',
+      salary: '₹ 18,000 - ₹ 24,000 per month',
+      location: 'Jadavpur, Kolkata (>100 kms)',
+      type: 'Full-Time',
+      vacancy: '25 Vacancies',
+      category: 'Domestic',
+    );
+    await DatabaseHelper.instance.insertJob(job);
+    setState(() {
+      _isSaved = true;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Job saved')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,48 +78,16 @@ class _DomesticServicesState extends State<DomesticServices> {
               ),
             ),
             const SizedBox(height: 20),
-            // 💼 Job Card
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
-                    "Junior Software Engineer",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 6),
-                  Text(
-                    "Jay Balaji Enterprise",
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    "₹ 18,000 - ₹ 24,000 per month",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 6),
-                  Text(
-                    "Jadavpur, Kolkata (>100 kms)",
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Chip(label: Text("Full-Time")),
-                      SizedBox(width: 8),
-                      Chip(label: Text("25 Vacancies")),
-                    ],
-                  ),
-                ],
-              ),
+            JobCard(
+              title: 'Junior Software Engineer',
+              company: 'Jay Balaji Enterprise',
+              salary: '₹ 18,000 - ₹ 24,000 per month',
+              location: 'Jadavpur, Kolkata (>100 kms)',
+              type: 'Full-Time',
+              vacancy: '25 Vacancies',
+              category: 'Domestic',
+              isSaved: _isSaved,
+              onSave: _saveJob,
             ),
           ],
         ),

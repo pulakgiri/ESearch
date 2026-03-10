@@ -1,6 +1,10 @@
 import 'package:esearch/util/color.dart';
 import 'package:flutter/material.dart';
 
+import '../models/saved_job.dart';
+import '../util/database_helper.dart';
+import '../widgets/job_card.dart';
+
 class CorporateJobs extends StatefulWidget {
   const CorporateJobs({super.key});
 
@@ -10,6 +14,46 @@ class CorporateJobs extends StatefulWidget {
 
 class _CorporateJobsState extends State<CorporateJobs> {
   final TextEditingController _searchController = TextEditingController();
+  bool _isSaved = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkSavedStatus();
+  }
+
+  Future<void> _checkSavedStatus() async {
+    // check uniqueness using the category too
+    const title = 'Junior Software Engineer';
+    const company = 'Jay Balaji Enterprise';
+    final exists = await DatabaseHelper.instance.isJobSaved(
+      title,
+      company,
+      category: 'Corporate',
+    );
+    setState(() {
+      _isSaved = exists;
+    });
+  }
+
+  Future<void> _saveJob() async {
+    final job = SavedJob(
+      title: 'Junior Software Engineer',
+      company: 'Jay Balaji Enterprise',
+      salary: '₹ 18,000 - ₹ 24,000 per month',
+      location: 'Jadavpur, Kolkata (>100 kms)',
+      type: 'Full-Time',
+      vacancy: '25 Vacancies',
+      category: 'Corporate',
+    );
+    await DatabaseHelper.instance.insertJob(job);
+    setState(() {
+      _isSaved = true;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Job saved')),
+    );
+  }
 
   @override
   void dispose() {
@@ -70,64 +114,16 @@ class _CorporateJobsState extends State<CorporateJobs> {
 
             const SizedBox(height: 20),
 
-            // 💼 Job Card
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
-                    "Junior Software Engineer",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 6),
-                  Text(
-                    "Jay Balaji Enterprise",
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 13,
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    "₹ 18,000 - ₹ 24,000 per month",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                  SizedBox(height: 6),
-                  Text(
-                    "Jadavpur, Kolkata (>100 kms)",
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 13,
-                    ),
-                  ),
-                  SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Chip(label: Text("Full-Time")),
-                      SizedBox(width: 8),
-                      Chip(label: Text("25 Vacancies")),
-                    ],
-                  ),
-                ],
-              ),
+            JobCard(
+              title: 'Junior Software Engineer',
+              company: 'Jay Balaji Enterprise',
+              salary: '₹ 18,000 - ₹ 24,000 per month',
+              location: 'Jadavpur, Kolkata (>100 kms)',
+              type: 'Full-Time',
+              vacancy: '25 Vacancies',
+              category: 'Corporate',
+              isSaved: _isSaved,
+              onSave: _saveJob,
             ),
           ],
         ),

@@ -212,7 +212,7 @@ class _HomeState extends State<Home> {
               ),
             ),
             SizedBox(
-              height: 120,
+              height: 150,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
