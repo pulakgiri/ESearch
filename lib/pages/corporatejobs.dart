@@ -2,12 +2,6 @@ import 'dart:convert';
 
 import 'package:esearch/util/color.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-
-import '../models/saved_job.dart';
-import '../util/database_helper.dart';
-import '../util/url.dart';
-import '../widgets/job_card.dart';
 
 class CorporateJobs extends StatefulWidget {
   const CorporateJobs({super.key});
@@ -51,123 +45,6 @@ class CorporateJob {
 
 class _CorporateJobsState extends State<CorporateJobs> {
   final TextEditingController _searchController = TextEditingController();
-
-  List<CorporateJob> _jobs = [];
-  Set<String> _savedKeys = {};
-  bool _loading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchJobs();
-  }
-
-  Future<void> _fetchJobs() async {
-    setState(() {
-      _loading = true;
-    });
-
-    try {
-      final uri = Uri.parse('${mainurl}get_jobs.php');
-      final response = await http.get(uri);
-      if (response.statusCode == 200) {
-        final jsondata = jsonDecode(response.body);
-        if (jsondata['status'] == true) {
-          final data = jsondata['data'];
-          List<CorporateJob> jobs = [];
-          if (data is List) {
-            for (var item in data) {
-              try {
-                jobs.add(
-                  CorporateJob.fromJson(Map<String, dynamic>.from(item)),
-                );
-              } catch (_) {}
-            }
-          } else if (data != null) {
-            try {
-              jobs.add(CorporateJob.fromJson(Map<String, dynamic>.from(data)));
-            } catch (_) {}
-          }
-          _jobs = jobs;
-          await _loadSavedStatus();
-        } else {
-          _jobs = [];
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(jsondata['msg'] ?? 'No jobs found')),
-            );
-          }
-        }
-      } else {
-        _jobs = [];
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Server error: ${response.statusCode}'),
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      _jobs = [];
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Network error: $e')),
-        );
-      }
-    }
-
-    if (mounted) {
-      setState(() {
-        _loading = false;
-      });
-    }
-  }
-
-  Future<void> _loadSavedStatus() async {
-    final Set<String> result = {};
-
-    for (var job in _jobs) {
-      final exists = await DatabaseHelper.instance.isJobSaved(
-        job.title,
-        job.company,
-        category: job.category,
-      );
-
-      if (exists) {
-        result.add('${job.title}|${job.company}');
-      }
-    }
-
-    if (!mounted) return;
-
-    setState(() {
-      _savedKeys = result;
-    });
-  }
-
-  void _saveJob(CorporateJob job) async {
-    final saved = SavedJob(
-      title: job.title,
-      company: job.company,
-      salary: job.salary,
-      location: job.location,
-      type: job.type,
-      vacancy: job.vacancy,
-      category: job.category,
-    );
-
-    await DatabaseHelper.instance.insertJob(saved);
-
-    setState(() {
-      _savedKeys.add('${job.title}|${job.company}');
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Job saved')),
-    );
-  }
 
   @override
   void dispose() {
@@ -244,46 +121,64 @@ class _CorporateJobsState extends State<CorporateJobs> {
 
             const SizedBox(height: 20),
 
-            Expanded(
-              child: _loading
-                  ? Center(
-                      child: CircularProgressIndicator(
-                        color: maincolor,
-                      ),
-                    )
-                  : filteredJobs.isEmpty
-                  ? const Center(
-                      child: Text(
-                        'No corporate jobs found',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    )
-                  : RefreshIndicator(
-                      onRefresh: _fetchJobs,
-                      child: ListView.separated(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        itemCount: filteredJobs.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 16),
-                        itemBuilder: (context, index) {
-                          final job = filteredJobs[index];
-
-                          final key = '${job.title}|${job.company}';
-                          final saved = _savedKeys.contains(key);
-
-                          return JobCard(
-                            title: job.title,
-                            company: job.company,
-                            salary: job.salary,
-                            location: job.location,
-                            type: job.type,
-                            vacancy: job.vacancy,
-                            category: job.category,
-                            isSaved: saved,
-                            onSave: saved ? null : () => _saveJob(job),
-                          );
-                        },
-                      ),
+            // 💼 Job Card
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text(
+                    "Junior Software Engineer",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
+                  ),
+                  SizedBox(height: 6),
+                  Text(
+                    "Jay Balaji Enterprise",
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 13,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    "₹ 18,000 - ₹ 24,000 per month",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                  SizedBox(height: 6),
+                  Text(
+                    "Jadavpur, Kolkata (>100 kms)",
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 13,
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Chip(label: Text("Full-Time")),
+                      SizedBox(width: 8),
+                      Chip(label: Text("25 Vacancies")),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),
