@@ -1,5 +1,5 @@
-import 'package:esearch/pages/spalshpage.dart';
-import 'package:esearch/theme/theme_provider.dart';
+import 'package:esearch/features/home/splash_page.dart';
+import 'package:esearch/core/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

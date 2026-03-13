@@ -6,7 +6,7 @@ class SavedJob {
   final String location;
   final String type;
   final String vacancy;
-  final String? category; // e.g. "Corporate", "Home-Based", "Skilled"
+  final String? category;
 
   SavedJob({
     this.id,

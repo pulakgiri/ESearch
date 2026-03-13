@@ -1,16 +1,16 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:esearch/pages/applied_job.dart';
-import 'package:esearch/pages/corporatejobs.dart';
-import 'package:esearch/pages/domesticservices.dart';
-import 'package:esearch/pages/editprofile.dart';
-import 'package:esearch/pages/login.dart';
-import 'package:esearch/pages/mynotifications.dart';
-import 'package:esearch/pages/postjob.dart';
-import 'package:esearch/pages/savejobs.dart';
-import 'package:esearch/pages/searchforjobs.dart';
-import 'package:esearch/util/url.dart';
+import 'package:esearch/features/jobs/applied_jobs_page.dart';
+import 'package:esearch/features/jobs/corporate/corporate_jobs_page.dart';
+import 'package:esearch/features/jobs/domestic/domestic_services_page.dart';
+import 'package:esearch/features/profile/edit_profile_page.dart';
+import 'package:esearch/features/auth/login_page.dart';
+import 'package:esearch/features/notifications/notifications_page.dart';
+import 'package:esearch/features/jobs/post_job.dart';
+import 'package:esearch/features/jobs/saved_jobs_page.dart';
+import 'package:esearch/features/jobs/search_jobs_page.dart';
+import 'package:esearch/core/constants/urls.dart';
 import 'package:flutter/material.dart';
-import 'package:esearch/util/globaluser.dart' as globaluser;
+import 'package:esearch/core/utils/global_user.dart' as globaluser;
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -495,7 +495,7 @@ class _HomeState extends State<Home> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        Icons.search,
+                        Icons.business_center,
                         size: 30,
                         color: const Color.fromARGB(255, 8, 20, 194),
                       ),

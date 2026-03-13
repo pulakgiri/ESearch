@@ -1,9 +1,9 @@
-import 'package:esearch/util/color.dart';
+import 'package:esearch/core/constants/colors.dart';
 import 'package:flutter/material.dart';
 
-import '../models/saved_job.dart';
-import '../util/database_helper.dart';
-import '../widgets/job_card.dart';
+import 'package:esearch/models/saved_job.dart';
+import 'package:esearch/core/utils/database_helper.dart';
+import 'package:esearch/widgets/job_card.dart';
 
 class DomesticServices extends StatefulWidget {
   const DomesticServices({super.key});

@@ -1,8 +1,8 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:esearch/pages/postcorporatejob.dart';
-import 'package:esearch/pages/posthomebasedjob.dart';
-import 'package:esearch/pages/postskillejob.dart';
-import 'package:esearch/util/color.dart';
+import 'package:esearch/features/jobs/corporate/post_corporate_job.dart';
+import 'package:esearch/features/jobs/domestic/post_home_job.dart';
+import 'package:esearch/features/jobs/skilled/post_skilled_job.dart';
+import 'package:esearch/core/constants/colors.dart';
 import 'package:flutter/material.dart';
 
 class PostJobPage extends StatefulWidget {

@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:esearch/util/color.dart';
-import 'package:esearch/util/loading.dart';
-import 'package:esearch/util/url.dart';
-import 'package:esearch/util/globaluser.dart' as globaluser;
+import 'package:esearch/core/constants/colors.dart';
+import 'package:esearch/core/utils/loading.dart';
+import 'package:esearch/core/constants/urls.dart';
+import 'package:esearch/core/utils/global_user.dart' as globaluser;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 

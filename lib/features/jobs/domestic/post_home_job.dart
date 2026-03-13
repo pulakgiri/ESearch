@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:esearch/theme/app_theme.dart';
-import 'package:esearch/util/color.dart';
-import 'package:esearch/util/loading.dart';
-import 'package:esearch/util/url.dart';
-import 'package:esearch/util/globaluser.dart' as globaluser;
+import 'package:esearch/core/theme/app_theme.dart';
+import 'package:esearch/core/constants/colors.dart';
+import 'package:esearch/core/utils/loading.dart';
+import 'package:esearch/core/constants/urls.dart';
+import 'package:esearch/core/utils/global_user.dart' as globaluser;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -216,10 +216,16 @@ class _PostHomebasedJobState extends State<PostHomebasedJob> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final maxWidth = screenWidth < 600 ? double.infinity : (screenWidth < 1024 ? 600.0 : 520.0);
-    final horizontalPadding = screenWidth < 600 ? 20.0 : (screenWidth < 1024 ? 40.0 : 60.0);
-    final verticalPadding = screenWidth < 600 ? 20.0 : (screenWidth < 1024 ? 28.0 : 36.0);
-    
+    final maxWidth = screenWidth < 600
+        ? double.infinity
+        : (screenWidth < 1024 ? 600.0 : 520.0);
+    final horizontalPadding = screenWidth < 600
+        ? 20.0
+        : (screenWidth < 1024 ? 40.0 : 60.0);
+    final verticalPadding = screenWidth < 600
+        ? 20.0
+        : (screenWidth < 1024 ? 28.0 : 36.0);
+
     return Scaffold(
       backgroundColor: AppTheme.offWhite,
       appBar: AppBar(
@@ -232,7 +238,11 @@ class _PostHomebasedJobState extends State<PostHomebasedJob> {
                 color: AppTheme.lightGray,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Icons.arrow_back, color: AppTheme.textPrimary, size: 20),
+              child: const Icon(
+                Icons.arrow_back,
+                color: AppTheme.textPrimary,
+                size: 20,
+              ),
             ),
             onPressed: () => Navigator.pop(context),
           ),
@@ -272,7 +282,7 @@ class _PostHomebasedJobState extends State<PostHomebasedJob> {
                 // Header Section
                 _buildHeaderSection(),
                 const SizedBox(height: 32),
-                
+
                 // Basic Information Card
                 _buildCard(
                   title: 'Basic Information',
@@ -295,7 +305,7 @@ class _PostHomebasedJobState extends State<PostHomebasedJob> {
                   ],
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Working Hours Card
                 _buildCard(
                   title: 'Working Hours',
@@ -323,7 +333,7 @@ class _PostHomebasedJobState extends State<PostHomebasedJob> {
                   ],
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Compensation & Location Card
                 _buildCard(
                   title: 'Compensation & Location',
@@ -348,7 +358,7 @@ class _PostHomebasedJobState extends State<PostHomebasedJob> {
                   ],
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Contact Information Card
                 _buildCard(
                   title: 'Contact Information',
@@ -372,7 +382,7 @@ class _PostHomebasedJobState extends State<PostHomebasedJob> {
                   ],
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Job Description Card
                 _buildCard(
                   title: 'Job Description',
@@ -380,7 +390,8 @@ class _PostHomebasedJobState extends State<PostHomebasedJob> {
                   children: [
                     _buildInputField(
                       label: "Description",
-                      hint: "Describe the job responsibilities and requirements in detail",
+                      hint:
+                          "Describe the job responsibilities and requirements in detail",
                       controller: descriptionCtrl,
                       icon: Icons.notes_rounded,
                       maxLines: 6,
@@ -389,7 +400,7 @@ class _PostHomebasedJobState extends State<PostHomebasedJob> {
                   ],
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Skills Card
                 _buildCard(
                   title: 'Required Skills',
@@ -399,7 +410,9 @@ class _PostHomebasedJobState extends State<PostHomebasedJob> {
                       Wrap(
                         spacing: 10,
                         runSpacing: 10,
-                        children: skills.map((skill) => _buildSkillChip(skill)).toList(),
+                        children: skills
+                            .map((skill) => _buildSkillChip(skill))
+                            .toList(),
                       ),
                       const SizedBox(height: 16),
                     ],
@@ -407,11 +420,11 @@ class _PostHomebasedJobState extends State<PostHomebasedJob> {
                   ],
                 ),
                 const SizedBox(height: 24),
-                
+
                 // WhatsApp Contact Card
                 _buildWhatsAppCard(),
                 const SizedBox(height: 36),
-                
+
                 // Submit Button
                 _buildSubmitButton(),
                 const SizedBox(height: 24),
@@ -439,7 +452,7 @@ class _PostHomebasedJobState extends State<PostHomebasedJob> {
         ),
         const SizedBox(height: 8),
         Text(
-          isEditing 
+          isEditing
               ? 'Make changes to your job posting'
               : 'Fill in the details to post a new home-based job',
           style: TextStyle(
@@ -567,7 +580,11 @@ class _PostHomebasedJobState extends State<PostHomebasedJob> {
                   : null,
               suffixIcon: suffixIcon != null
                   ? IconButton(
-                      icon: Icon(suffixIcon, color: AppTheme.primaryBlue, size: 22),
+                      icon: Icon(
+                        suffixIcon,
+                        color: AppTheme.primaryBlue,
+                        size: 22,
+                      ),
                       onPressed: onSuffixTap,
                     )
                   : null,
@@ -739,7 +756,9 @@ class _PostHomebasedJobState extends State<PostHomebasedJob> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: AppTheme.cardShadow,
         border: Border.all(
-          color: allowWhatsapp ? AppTheme.success.withValues(alpha: 0.3) : AppTheme.borderColor,
+          color: allowWhatsapp
+              ? AppTheme.success.withValues(alpha: 0.3)
+              : AppTheme.borderColor,
           width: 1.5,
         ),
       ),
@@ -756,11 +775,15 @@ class _PostHomebasedJobState extends State<PostHomebasedJob> {
                   width: 52,
                   height: 52,
                   decoration: BoxDecoration(
-                    color: allowWhatsapp ? AppTheme.success : AppTheme.lightGray,
+                    color: allowWhatsapp
+                        ? AppTheme.success
+                        : AppTheme.lightGray,
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Icon(
-                    allowWhatsapp ? Icons.check_circle_rounded : Icons.chat_bubble_outline_rounded,
+                    allowWhatsapp
+                        ? Icons.check_circle_rounded
+                        : Icons.chat_bubble_outline_rounded,
                     color: allowWhatsapp ? AppTheme.white : AppTheme.darkGray,
                     size: 26,
                   ),
@@ -781,7 +804,7 @@ class _PostHomebasedJobState extends State<PostHomebasedJob> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        allowWhatsapp 
+                        allowWhatsapp
                             ? 'Candidates can contact via WhatsApp'
                             : 'Tap to allow WhatsApp contact',
                         style: TextStyle(
@@ -795,7 +818,9 @@ class _PostHomebasedJobState extends State<PostHomebasedJob> {
                   ),
                 ),
                 Icon(
-                  allowWhatsapp ? Icons.toggle_on_rounded : Icons.toggle_off_rounded,
+                  allowWhatsapp
+                      ? Icons.toggle_on_rounded
+                      : Icons.toggle_off_rounded,
                   color: allowWhatsapp ? AppTheme.success : AppTheme.mediumGray,
                   size: 48,
                 ),

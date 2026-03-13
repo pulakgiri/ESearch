@@ -1,5 +1,12 @@
-import 'package:esearch/util/color.dart';
+import 'dart:convert';
+
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:esearch/core/constants/colors.dart';
+import 'package:esearch/core/utils/loading.dart';
+import 'package:esearch/core/constants/urls.dart';
+import 'package:esearch/core/utils/global_user.dart' as globaluser;
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 class PostSkillejob extends StatefulWidget {
@@ -69,7 +76,6 @@ class _PostSkillejobState extends State<PostSkillejob> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// JOB CATEGORY
             _sectionTitle("Job Category"),
             _card(
               child: Column(
@@ -107,7 +113,6 @@ class _PostSkillejobState extends State<PostSkillejob> {
 
                   const SizedBox(height: 16),
 
-                  /// TAG INPUT
                   Row(
                     children: [
                       Expanded(
@@ -137,7 +142,6 @@ class _PostSkillejobState extends State<PostSkillejob> {
 
             const SizedBox(height: 24),
 
-            /// EXPERIENCE
             _sectionTitle("Experience & Qualification"),
             _card(
               child: Column(
@@ -186,7 +190,6 @@ class _PostSkillejobState extends State<PostSkillejob> {
 
             const SizedBox(height: 24),
 
-            /// WORK DETAILS
             _sectionTitle("Work Details & Pay"),
             _card(
               child: Column(
@@ -246,8 +249,6 @@ class _PostSkillejobState extends State<PostSkillejob> {
             ),
 
             const SizedBox(height: 24),
-
-            /// LOCATION
             _sectionTitle("Location & Contact"),
 
             _card(
@@ -261,24 +262,6 @@ class _PostSkillejobState extends State<PostSkillejob> {
                     prefixIcon: Icons.location_on,
                     controller: locationController,
                     keyboardType: TextInputType.text,
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  Container(
-                    height: 160,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      color: Colors.grey.shade300,
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.map,
-                        size: 40,
-                        color: Colors.blue,
-                      ),
-                    ),
                   ),
                 ],
               ),
@@ -308,8 +291,6 @@ class _PostSkillejobState extends State<PostSkillejob> {
       ),
     );
   }
-
-  /// UI HELPERS
 
   Widget _sectionTitle(String text) {
     return Padding(
@@ -537,26 +518,118 @@ class _PostSkillejobState extends State<PostSkillejob> {
     });
   }
 
-  void _postJob() {
-    final data = {
-      "category": categoryController.text,
-      "specificSkill": specificSkillController.text,
-      "tags": tags.toList(),
-      "experience": minExpController.text,
-      "certification": certification,
-      "tools": toolsController.text,
-      "description": descriptionController.text,
-      "startDate": startDateController.text,
-      "endDate": endDateController.text,
-      "amount": amountController.text,
-      "rateType": rateType,
-      "location": locationController.text,
+  Future<void> _postJob() async {
+    final cat = categoryController.text.trim();
+    final spec = specificSkillController.text.trim();
+    final desc = descriptionController.text.trim();
+    if (cat.isEmpty || spec.isEmpty || desc.isEmpty) {
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.error,
+        animType: AnimType.bottomSlide,
+        title: 'Missing Fields',
+        desc: 'Please provide category, specific skill and description.',
+        btnOkOnPress: () {},
+      ).show();
+      return;
+    }
+
+    final List<String> finalTags = List.from(tags);
+    final pending = tagController.text.trim();
+    if (pending.isNotEmpty && !finalTags.contains(pending)) {
+      finalTags.add(pending);
+    }
+
+    Map<String, String> data = {
+      'userid': globaluser.user.userid.toString(),
+      'category': cat,
+      'specific_skill': spec,
+      'tags': finalTags.join(', '),
+      'min_experience': minExpController.text.trim(),
+      'certification': certification ?? '',
+      'tools': toolsController.text.trim(),
+      'description': desc,
+      'start_date': startDateController.text.trim(),
+      'end_date': endDateController.text.trim(),
+      'amount': amountController.text.trim(),
+      'rate_type': rateType,
+      'location': locationController.text.trim(),
     };
 
-    debugPrint(data.toString());
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Job Posted")),
+    showDialog(
+      context: context,
+      builder: (context) => PopScope(
+        canPop: false,
+        child: const LoadingDialog(),
+      ),
+      barrierDismissible: false,
     );
+
+    try {
+      final response = await http.post(
+        Uri.parse("${mainurl}post_skilled_labor.php"),
+        body: data,
+      );
+
+      debugPrint('post_skilled_labor status: ${response.statusCode}');
+      debugPrint('post_skilled_labor body: ${response.body}');
+
+      late Map<String, dynamic> jsondata;
+      try {
+        jsondata = jsonDecode(response.body);
+      } catch (e) {
+        if (!mounted) return;
+        Navigator.pop(context);
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.error,
+          animType: AnimType.bottomSlide,
+          title: 'Server Error',
+          desc: 'Invalid response from server:\n${response.body}',
+          btnOkOnPress: () {},
+        ).show();
+        return;
+      }
+
+      if (jsondata['status'] == true) {
+        if (!mounted) return;
+        Navigator.pop(context);
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.success,
+          animType: AnimType.bottomSlide,
+          title: 'Post Success',
+          dismissOnTouchOutside: false,
+          btnOkOnPress: () {
+            _resetForm();
+          },
+        ).show();
+      } else {
+        if (!mounted) return;
+        Navigator.pop(context);
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.error,
+          animType: AnimType.bottomSlide,
+          desc: jsondata['msg'] ?? 'Failed to post job',
+          dismissOnTouchOutside: false,
+          btnOkOnPress: () {},
+        ).show();
+      }
+    } catch (e) {
+      if (!mounted) return;
+      try {
+        Navigator.pop(context);
+      } catch (_) {}
+      debugPrint('post_skilled_job exception: $e');
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.error,
+        animType: AnimType.bottomSlide,
+        title: 'Network Error',
+        desc: 'Error: ${e.toString()}',
+        btnOkOnPress: () {},
+      ).show();
+    }
   }
 }

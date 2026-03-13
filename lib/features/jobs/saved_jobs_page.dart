@@ -1,8 +1,8 @@
-import 'package:esearch/util/color.dart';
+import 'package:esearch/core/constants/colors.dart';
 import 'package:flutter/material.dart';
 
-import '../models/saved_job.dart';
-import '../util/database_helper.dart';
+import '../../models/saved_job.dart';
+import '../../core/utils/database_helper.dart';
 
 class SavedJobs extends StatefulWidget {
   const SavedJobs({super.key});

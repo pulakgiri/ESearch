@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:esearch/pages/basicinfo.dart';
-import 'package:esearch/pages/skills.dart';
-import 'package:esearch/util/color.dart';
-import 'package:esearch/util/loading.dart';
-import 'package:esearch/util/url.dart';
+import 'package:esearch/features/profile/basic_info_page.dart';
+import 'package:esearch/features/profile/skills_page.dart';
+import 'package:esearch/core/constants/colors.dart';
+import 'package:esearch/core/utils/loading.dart';
+import 'package:esearch/core/constants/urls.dart';
 import 'package:http/http.dart' as http;
-import 'package:esearch/util/globaluser.dart' as globaluser;
+import 'package:esearch/core/utils/global_user.dart' as globaluser;
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -318,14 +318,16 @@ class _EditprofileState extends State<Editprofile>
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Edit Profile"),
-        backgroundColor: Color.fromARGB(213, 34, 87, 130),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.done_outlined),
-            onPressed: () {},
+        title: const Text(
+          "Edit Profile",
+          style: TextStyle(
+            color: Colors.white,
           ),
-        ],
+        ),
+        backgroundColor: maincolor,
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ),
       ),
 
       body: Column(

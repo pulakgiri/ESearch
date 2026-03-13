@@ -2,17 +2,17 @@ import 'dart:convert';
 import 'package:async/async.dart';
 import 'package:esearch/models/user.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:esearch/pages/forgotpassword.dart';
-import 'package:esearch/pages/home.dart';
-import 'package:esearch/pages/signup.dart';
-import 'package:esearch/util/color.dart';
-import 'package:esearch/util/loading.dart';
-import 'package:esearch/util/url.dart';
+import 'package:esearch/features/auth/forgot_password_page.dart';
+import 'package:esearch/features/home/home_page.dart';
+import 'package:esearch/features/auth/signup_page.dart';
+import 'package:esearch/core/constants/colors.dart';
+import 'package:esearch/core/utils/loading.dart';
+import 'package:esearch/core/constants/urls.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
-import 'package:esearch/util/globaluser.dart' as globaluser;
+import 'package:esearch/core/utils/global_user.dart' as globaluser;
 
 class Login extends StatefulWidget {
   const Login({super.key});

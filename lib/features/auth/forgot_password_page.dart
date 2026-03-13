@@ -1,4 +1,4 @@
-import 'package:esearch/util/color.dart';
+import 'package:esearch/core/constants/colors.dart';
 import 'package:flutter/material.dart';
 
 class Forgotpassword extends StatefulWidget {

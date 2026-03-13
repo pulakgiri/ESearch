@@ -2,8 +2,9 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:dropdown_textfield/dropdown_textfield.dart';
-import 'package:esearch/util/globaluser.dart' as globaluser;
-import 'package:esearch/util/url.dart';
+import 'package:esearch/core/constants/urls.dart';
+import 'package:esearch/core/utils/global_user.dart' as globaluser;
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 

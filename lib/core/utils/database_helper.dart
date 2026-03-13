@@ -1,7 +1,7 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../models/saved_job.dart';
+import '../../models/saved_job.dart';
 
 class DatabaseHelper {
   DatabaseHelper._privateConstructor();
