@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:esearch/features/jobs/applied_jobs_page.dart';
 import 'package:esearch/features/jobs/corporate/corporate_jobs_page.dart';
 import 'package:esearch/features/jobs/domestic/domestic_services_page.dart';
+import 'package:esearch/features/jobs/skilled/skilled_labor_page.dart';
 import 'package:esearch/features/profile/edit_profile_page.dart';
 import 'package:esearch/features/auth/login_page.dart';
 import 'package:esearch/features/notifications/notifications_page.dart';
@@ -28,6 +29,13 @@ class _HomeState extends State<Home> {
   void initState() {
     user_image.value = globaluser.user.image.toString();
     super.initState();
+  }
+
+  Future<void> _refreshPage() async {
+    await Future.delayed(Duration(seconds: 1));
+    setState(() {
+      user_image.value = globaluser.user.image.toString();
+    });
   }
 
   void showJobTypeDialog(BuildContext context) {
@@ -201,430 +209,457 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ListTile(
-              leading: Obx(
-                () => CircleAvatar(
-                  radius: 30,
-                  backgroundImage: NetworkImage(
-                    profile_image_url + user_image.value,
-                    scale: 0.5,
-                  ),
-                ),
-              ),
-              title: AutoSizeText(
-                globaluser.user.fullname == null
-                    ? "-"
-                    : globaluser.user.fullname.toString(),
-                style: TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
-                ),
-                maxLines: 1,
-              ),
-              subtitle: AutoSizeText(
-                "App Developer",
-                style: TextStyle(
-                  fontSize: 15,
-                ),
-                maxLines: 1,
-              ),
-              trailing: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Editprofile(),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 56, 129, 255),
-                  foregroundColor: const Color.fromARGB(255, 255, 255, 255),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  "Edit Profile",
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(3),
-              child: AutoSizeText(
-                "Job Categories",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-                maxLines: 1,
-              ),
-            ),
-            SizedBox(
-              height: 150,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CorporateJobs(),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      width: 100,
-                      margin: const EdgeInsets.only(right: 12),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(90, 123, 188, 242),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(
-                            Icons.business,
-                            color: Color.fromARGB(239, 44, 33, 243),
-                            size: 50,
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            "Corporate\nJobs",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Color.fromARGB(255, 14, 13, 18),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
+      body: RefreshIndicator(
+        onRefresh: _refreshPage,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+
+          padding: EdgeInsets.all(15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ListTile(
+                leading: Obx(
+                  () => CircleAvatar(
+                    radius: 30,
+                    backgroundImage: NetworkImage(
+                      profile_image_url + user_image.value,
+                      scale: 0.5,
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DomesticServices(),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      width: 100,
-                      margin: const EdgeInsets.only(right: 12),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(150, 80, 182, 83),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(
-                            Icons.home,
-                            color: Color.fromARGB(255, 7, 114, 10),
-                            size: 50,
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            "Domestic\nServices",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Color.fromARGB(255, 2, 48, 3),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                ),
+                title: AutoSizeText(
+                  globaluser.user.fullname == null
+                      ? "-"
+                      : globaluser.user.fullname.toString(),
+                  style: TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
                   ),
-                  Container(
-                    width: 100,
-                    margin: const EdgeInsets.only(right: 12),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(90, 123, 188, 242),
+                  maxLines: 1,
+                ),
+                subtitle: AutoSizeText(
+                  "App Developer",
+                  style: TextStyle(
+                    fontSize: 15,
+                  ),
+                  maxLines: 1,
+                ),
+                trailing: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Editprofile(),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 56, 129, 255),
+                    foregroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(
-                          Icons.handyman,
-                          color: Color.fromARGB(239, 44, 33, 243),
-                          size: 50,
-                        ),
-                        SizedBox(height: 8),
-
-                        Text(
-                          "Skilled\nLabour",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color.fromARGB(255, 30, 2, 61),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
+                  ),
+                  child: Text(
+                    "Edit Profile",
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(3),
+                child: AutoSizeText(
+                  "Job Categories",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 1,
+                ),
+              ),
+              SizedBox(
+                height: 150,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CorporateJobs(),
                           ),
+                        );
+                      },
+                      child: Container(
+                        width: 100,
+                        margin: const EdgeInsets.only(right: 12),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(90, 123, 188, 242),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(
+                              Icons.business,
+                              color: Color.fromARGB(239, 44, 33, 243),
+                              size: 50,
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              "Corporate\nJobs",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Color.fromARGB(255, 14, 13, 18),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DomesticServices(),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: 100,
+                        margin: const EdgeInsets.only(right: 12),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(150, 80, 182, 83),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(
+                              Icons.home,
+                              color: Color.fromARGB(255, 7, 114, 10),
+                              size: 50,
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              "Domestic\nServices",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Color.fromARGB(255, 2, 48, 3),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SkilledLabourPage(),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: 100,
+                        margin: const EdgeInsets.only(right: 12),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(90, 123, 188, 242),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(
+                              Icons.handyman,
+                              color: Color.fromARGB(239, 44, 33, 243),
+                              size: 50,
+                            ),
+                            SizedBox(height: 8),
+
+                            Text(
+                              "Skilled\nLabour",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Color.fromARGB(255, 30, 2, 61),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(6),
+                child: AutoSizeText(
+                  "Quick Action",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 1,
+                ),
+              ),
+              GridView.count(
+                crossAxisCount: 2,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+                childAspectRatio: 3.2,
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(208, 176, 207, 255),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        vertical: 14,
+                        horizontal: 16,
+                      ),
+                      elevation: 3,
+                    ),
+                    onPressed: () => showJobTypeDialog(context),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.add,
+                          size: 30,
+                          color: const Color.fromARGB(255, 2, 116, 6),
+                        ),
+                        SizedBox(width: 8),
+                        AutoSizeText(
+                          "Post Job",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.black,
+                          ),
+                          maxLines: 1,
+                          maxFontSize: 18,
+                          minFontSize: 15,
+                        ),
+                      ],
+                    ),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(208, 176, 207, 255),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        vertical: 14,
+                        horizontal: 16,
+                      ),
+                      elevation: 3,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SearchForJobs(),
+                        ),
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.search,
+                          size: 30,
+                          color: const Color.fromARGB(255, 8, 20, 194),
+                        ),
+                        SizedBox(width: 8),
+                        AutoSizeText(
+                          "Search Job",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.black,
+                          ),
+                          maxLines: 1,
+                          maxFontSize: 18,
+                          minFontSize: 15,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(208, 176, 207, 255),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        vertical: 14,
+                        horizontal: 16,
+                      ),
+                      elevation: 3,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AppliedJob(),
+                        ),
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.business_center,
+                          size: 30,
+                          color: const Color.fromARGB(255, 8, 20, 194),
+                        ),
+                        SizedBox(width: 8),
+                        AutoSizeText(
+                          "Applied Job",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.black,
+                          ),
+                          maxLines: 2,
+                          maxFontSize: 18,
+                          minFontSize: 12,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(208, 176, 207, 255),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        vertical: 14,
+                        horizontal: 16,
+                      ),
+                      elevation: 3,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SavedJobs(),
+                        ),
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.bookmark,
+                          size: 30,
+                          color: const Color.fromARGB(255, 0, 255, 76),
+                        ),
+                        SizedBox(width: 8),
+                        AutoSizeText(
+                          "Saved Job",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.black,
+                          ),
+                          maxLines: 1,
+                          maxFontSize: 18,
+                          minFontSize: 15,
                         ),
                       ],
                     ),
                   ),
                 ],
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(6),
-              child: AutoSizeText(
-                "Quick Action",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+              Padding(
+                padding: EdgeInsets.all(6),
+                child: Text(
+                  "Quick Action",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                maxLines: 1,
               ),
-            ),
-            GridView.count(
-              crossAxisCount: 2,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              childAspectRatio: 3.2,
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(208, 176, 207, 255),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              ListView(
+                shrinkWrap: true,
+                children: [
+                  ListTile(
+                    leading: Icon(Icons.business_center),
+                    title: Text('Software Engineer'),
+                    subtitle: Text('ABC Inc.'),
+                    trailing: ElevatedButton(
+                      onPressed: () {},
+                      // style: ElevatedButton.styleFrom(
+                      //   foregroundBuilder: Colors.cyanAccent,
+                      // ),
+                      child: Text('Apply Now'),
                     ),
-                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                    elevation: 3,
                   ),
-                  onPressed: () => showJobTypeDialog(context),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.add,
-                        size: 30,
-                        color: const Color.fromARGB(255, 2, 116, 6),
-                      ),
-                      SizedBox(width: 8),
-                      AutoSizeText(
-                        "Post Job",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.black,
-                        ),
-                        maxLines: 1,
-                        maxFontSize: 18,
-                        minFontSize: 15,
-                      ),
-                    ],
-                  ),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(208, 176, 207, 255),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                    elevation: 3,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SearchForJobs(),
-                      ),
-                    );
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.search,
-                        size: 30,
-                        color: const Color.fromARGB(255, 8, 20, 194),
-                      ),
-                      SizedBox(width: 8),
-                      AutoSizeText(
-                        "Search Job",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.black,
-                        ),
-                        maxLines: 1,
-                        maxFontSize: 18,
-                        minFontSize: 15,
-                      ),
-                    ],
-                  ),
-                ),
+                ],
+              ),
 
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(208, 176, 207, 255),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                    elevation: 3,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AppliedJob(),
-                      ),
-                    );
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.business_center,
-                        size: 30,
-                        color: const Color.fromARGB(255, 8, 20, 194),
-                      ),
-                      SizedBox(width: 8),
-                      AutoSizeText(
-                        "Applied Job",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.black,
-                        ),
-                        maxLines: 2,
-                        maxFontSize: 18,
-                        minFontSize: 12,
-                      ),
-                    ],
+              Padding(
+                padding: EdgeInsets.all(6),
+                child: Text(
+                  "Testimonials",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(208, 176, 207, 255),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                    elevation: 3,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SavedJobs(),
-                      ),
-                    );
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.bookmark,
-                        size: 30,
-                        color: const Color.fromARGB(255, 0, 255, 76),
-                      ),
-                      SizedBox(width: 8),
-                      AutoSizeText(
-                        "Saved Job",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.black,
-                        ),
-                        maxLines: 1,
-                        maxFontSize: 18,
-                        minFontSize: 15,
-                      ),
-                    ],
+              ),
+              ListTile(
+                leading: CircleAvatar(
+                  radius: 30,
+                  backgroundImage: AssetImage(
+                    "assets/images/user2.jpg",
                   ),
                 ),
-              ],
-            ),
-            Padding(
-              padding: EdgeInsets.all(6),
-              child: Text(
-                "Quick Action",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            ListView(
-              shrinkWrap: true,
-              children: [
-                ListTile(
-                  leading: Icon(Icons.business_center),
-                  title: Text('Software Engineer'),
-                  subtitle: Text('ABC Inc.'),
-                  trailing: ElevatedButton(
-                    onPressed: () {},
-                    // style: ElevatedButton.styleFrom(
-                    //   foregroundBuilder: Colors.cyanAccent,
-                    // ),
-                    child: Text('Apply Now'),
+                title: Text(
+                  "Pulak Giri",
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ],
-            ),
-
-            Padding(
-              padding: EdgeInsets.all(6),
-              child: Text(
-                "Testimonials",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                subtitle: AutoSizeText(
+                  "App Developer",
+                  style: TextStyle(
+                    fontSize: 12,
+                  ),
+                  maxLines: 1,
+                ),
+                trailing: ElevatedButton(
+                  onPressed: () {},
+                  child: Icon(
+                    Icons.wechat_rounded,
+                    size: 40,
+                  ),
                 ),
               ),
-            ),
-            ListTile(
-              leading: CircleAvatar(
-                radius: 30,
-                backgroundImage: AssetImage(
-                  "assets/images/user2.jpg",
-                ),
-              ),
-              title: Text(
-                "Pulak Giri",
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              subtitle: AutoSizeText(
-                "App Developer",
-                style: TextStyle(
-                  fontSize: 12,
-                ),
-                maxLines: 1,
-              ),
-              trailing: ElevatedButton(
-                onPressed: () {},
-                child: Icon(
-                  Icons.wechat_rounded,
-                  size: 40,
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       // bottomNavigationBar: BottomNavigationBar(

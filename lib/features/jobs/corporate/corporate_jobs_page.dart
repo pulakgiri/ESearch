@@ -1,9 +1,10 @@
 import 'dart:convert';
-import 'package:esearch/core/constants/urls.dart';
-import 'package:http/http.dart' as http;
-
 import 'package:esearch/core/constants/colors.dart';
+import 'package:esearch/core/constants/urls.dart';
+import 'package:esearch/core/utils/global_user.dart' as globaluser;
+import 'package:esearch/features/jobs/job_details_page.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class CorporateJobs extends StatefulWidget {
   const CorporateJobs({super.key});
@@ -13,26 +14,38 @@ class CorporateJobs extends StatefulWidget {
 }
 
 class CorporateJob {
+  final int id;
+  final String jobid;
   final String title;
   final String company;
   final String salary;
   final String location;
   final String type;
   final String vacancy;
+  final String postedBy;
+  final String jobDescription;
+  final String createdAt;
   final String category;
 
   CorporateJob({
+    required this.id,
+    required this.jobid,
     required this.title,
     required this.company,
     required this.salary,
     required this.location,
     required this.type,
     required this.vacancy,
+    required this.postedBy,
+    required this.jobDescription,
+    required this.createdAt,
     this.category = 'Corporate',
   });
 
   factory CorporateJob.fromJson(Map<String, dynamic> json) {
     return CorporateJob(
+      id: int.tryParse(json['id']?.toString() ?? '') ?? 0,
+      jobid: json['jobid']?.toString() ?? '',
       title: json['job_title']?.toString() ?? json['title']?.toString() ?? '',
       company:
           json['company']?.toString() ?? json['company_name']?.toString() ?? '',
@@ -41,6 +54,12 @@ class CorporateJob {
       type: json['employment_type']?.toString() ?? '',
       vacancy:
           json['vacancies']?.toString() ?? json['vacancy']?.toString() ?? '',
+      postedBy: json['posted_by']?.toString() ?? '',
+      jobDescription:
+          json['job_description']?.toString() ??
+          json['description']?.toString() ??
+          '',
+      createdAt: json['created_at']?.toString() ?? '',
     );
   }
 }
@@ -99,6 +118,117 @@ class _CorporateJobsState extends State<CorporateJobs> {
 
   Future<void> _deleteJob(int index) async {
     setState(() => _jobs.removeAt(index));
+  }
+
+  Future<void> _applyCorporateJob(CorporateJob job) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${mainurl}apply_job.php'),
+        body: {
+          'userid': globaluser.user.userid ?? '',
+          'job_id': job.id.toString(),
+          'job_type': 'corporate',
+        },
+      );
+      final body = json.decode(response.body);
+      if (response.statusCode == 200 && body['status'] == true) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(body['msg'] ?? 'Applied successfully')),
+        );
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(body['msg'] ?? 'Failed to apply')),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error applying: $e')),
+      );
+    }
+  }
+
+  Future<void> _showManageOptions(CorporateJob job) async {
+    final selected = await showModalBottomSheet<String>(
+      context: context,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Manage ${job.title}',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Icon(Icons.list_alt),
+              title: const Text('View Applicants'),
+              onTap: () => Navigator.pop(context, 'applicants'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete),
+              title: const Text('Delete Job (local)'),
+              onTap: () => Navigator.pop(context, 'delete'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (selected == 'delete') {
+      setState(() {
+        _jobs.removeWhere((element) => element.id == job.id);
+      });
+    }
+    if (selected == 'applicants') {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Applicants for ${job.title}'),
+          content: const Text(
+            'Applicants are available in Applied Jobs quick action.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  void _openJobDetails(CorporateJob job) {
+    final isMine = job.postedBy == globaluser.user.userid;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => JobDetailsPage(
+          title: job.title,
+          details: {
+            'Company': job.company,
+            'Location': job.location,
+            'Salary': job.salary,
+            'Type': job.type,
+            'Vacancies': job.vacancy,
+            'Description': job.jobDescription,
+            'Posted By': job.postedBy,
+          },
+          canApply: !isMine,
+          onApply: () => _applyCorporateJob(job),
+          canDelete: isMine,
+          onDelete: () {
+            _showManageOptions(job);
+            Navigator.pop(context);
+          },
+        ),
+      ),
+    );
   }
 
   @override
@@ -191,57 +321,69 @@ class _CorporateJobsState extends State<CorporateJobs> {
   }
 
   Widget _jobCard(CorporateJob job, int index) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  job.title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+    final isMine = job.postedBy == globaluser.user.userid;
+    return InkWell(
+      onTap: () => _openJobDetails(job),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    job.title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
+                IconButton(
+                  icon: const Icon(Icons.bookmark, color: Colors.blue),
+                  onPressed: () => _deleteJob(index),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(job.company, style: const TextStyle(color: Colors.grey)),
+            const SizedBox(height: 10),
+            Text(
+              job.salary,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 6),
+            Text(job.location, style: const TextStyle(color: Colors.grey)),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Chip(label: Text(job.type)),
+                const SizedBox(width: 8),
+                Chip(label: Text(job.vacancy)),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerRight,
+              child: ElevatedButton(
+                onPressed: () {
+                  if (isMine) {
+                    _showManageOptions(job);
+                  } else {
+                    _applyCorporateJob(job);
+                  }
+                },
+                child: Text(isMine ? 'Manage' : 'Apply'),
               ),
-              IconButton(
-                icon: const Icon(Icons.bookmark, color: Colors.blue),
-                onPressed: () => _deleteJob(index),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            job.company,
-            style: const TextStyle(color: Colors.grey),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            job.salary,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            job.location,
-            style: const TextStyle(color: Colors.grey),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Chip(label: Text(job.type)),
-              const SizedBox(width: 8),
-              Chip(label: Text(job.vacancy)),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,356 +1,153 @@
 import 'dart:convert';
-import 'dart:developer';
-import 'package:dropdown_textfield/dropdown_textfield.dart';
-import 'package:esearch/models/user_skill.dart';
-import 'package:esearch/core/utils/global_user.dart' as globaluser;
+import 'package:esearch/core/constants/colors.dart';
 import 'package:esearch/core/constants/urls.dart';
+import 'package:esearch/features/jobs/job_details_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class SkillInfoPage extends StatefulWidget {
-  const SkillInfoPage({super.key});
+class SkilledLabourPage extends StatefulWidget {
+  const SkilledLabourPage({super.key});
 
   @override
-  State<SkillInfoPage> createState() => _SkillInfoPageState();
+  State<SkilledLabourPage> createState() => _SkilledLabourPageState();
 }
 
-class _SkillInfoPageState extends State<SkillInfoPage> {
-  // Controllers
-  late SingleValueDropDownController qualificationController;
-  final TextEditingController universityController = TextEditingController();
-  final TextEditingController yearController = TextEditingController();
-  final TextEditingController skillTagController = TextEditingController();
+class SkilledJob {
+  final int id;
+  final String jobid;
+  final String category;
+  final String specificSkill;
+  final String description;
+  final String location;
+  final String amount;
+  final String rateType;
+  final String postedBy;
 
-  // User
-  String userid = "";
+  SkilledJob({
+    required this.id,
+    required this.jobid,
+    required this.category,
+    required this.specificSkill,
+    required this.description,
+    required this.location,
+    required this.amount,
+    required this.rateType,
+    required this.postedBy,
+  });
 
-  // State
-  bool isLoading = false;
-  UserSkill? userSkill;
+  factory SkilledJob.fromJson(Map<String, dynamic> json) {
+    return SkilledJob(
+      id: int.tryParse(json['id']?.toString() ?? '') ?? 0,
+      jobid: json['jobid']?.toString() ?? '',
+      category: json['category']?.toString() ?? '',
+      specificSkill: json['specific_skill']?.toString() ?? '',
+      description: json['description']?.toString() ?? '',
+      location: json['location']?.toString() ?? '',
+      amount: json['amount']?.toString() ?? '',
+      rateType: json['rate_type']?.toString() ?? '',
+      postedBy: json['posted_by']?.toString() ?? '',
+    );
+  }
+}
 
-  String qualification = "";
-  String? selectedPosition;
-  String? selectedExperience;
-
-  final Set<String> selectedRoles = {};
-  final List<String> skills = [];
-
-  // Dropdown Data
-  final List<DropDownValueModel> qualifications = [
-    DropDownValueModel(name: "MP", value: 1),
-    DropDownValueModel(name: "HS", value: 2),
-    DropDownValueModel(name: "Diploma", value: 3),
-    DropDownValueModel(name: "Graduation", value: 4),
-    DropDownValueModel(name: "Post Graduation", value: 5),
-    DropDownValueModel(name: "Masters", value: 6),
-    DropDownValueModel(name: "PHD", value: 7),
-  ];
-
-  final List<String> jobRoles = [
-    'Software Engineer',
-    'Data Analyst',
-    'Project Manager',
-    'HR Executive',
-    'Other',
-  ];
-
-  final List<String> experiences = [
-    'None',
-    '0 - 1 Year',
-    '1 - 3 Years',
-    '3 - 5 Years',
-    '5+ Years',
-  ];
-
-  final List<String> positionLevels = [
-    'Intern',
-    'Junior',
-    'Mid-Level',
-    'Senior',
-    'Lead',
-    'Manager',
-  ];
+class _SkilledLabourPageState extends State<SkilledLabourPage> {
+  bool isLoading = true;
+  List<SkilledJob> jobs = [];
 
   @override
   void initState() {
     super.initState();
-    userid = globaluser.user.userid.toString();
-    qualificationController = SingleValueDropDownController();
-    fetchSkillInfo();
+    _loadJobs();
   }
 
-  @override
-  void dispose() {
-    qualificationController.dispose();
-    universityController.dispose();
-    yearController.dispose();
-    skillTagController.dispose();
-    super.dispose();
-  }
-
-  // ================= FETCH DATA =================
-  Future<void> fetchSkillInfo() async {
-    try {
-      final response = await http.post(
-        Uri.parse("${mainurl}get_skills.php"),
-        headers: {"Content-Type": "application/x-www-form-urlencoded"},
-        body: {"userid": userid},
-      );
-
-      final data = json.decode(response.body);
-
-      if (data['status'] == true && data['data'] != null) {
-        userSkill = UserSkill.fromJson(data['data']);
-
-        qualification = userSkill!.highestQualifications ?? "";
-        universityController.text = userSkill!.university ?? "";
-        yearController.text = userSkill!.yearGraduation ?? "";
-        selectedPosition = userSkill!.positionLevel;
-        selectedExperience = userSkill!.workExperience;
-
-        selectedRoles
-          ..clear()
-          ..addAll((userSkill!.jobRole ?? "").split(','));
-
-        skills
-          ..clear()
-          ..addAll((userSkill!.skills ?? "").split(','));
-
-        final match = qualifications.firstWhere(
-          (e) => e.name == qualification,
-          orElse: () => qualifications.first,
-        );
-
-        qualificationController.dropDownValue = match;
-
-        setState(() {});
-      }
-    } catch (e) {
-      log("Fetch Error: $e");
-    }
-  }
-
-  // ================= SAVE DATA =================
-  Future<void> saveSkillInfo() async {
+  Future<void> _loadJobs() async {
     setState(() => isLoading = true);
-
     try {
-      final response = await http.post(
-        Uri.parse("${mainurl}skills.php"),
-        headers: {"Content-Type": "application/x-www-form-urlencoded"},
-        body: {
-          "userid": userid,
-          "highest_qualifications": qualification,
-          "degree": qualification,
-          "university": universityController.text,
-          "year_graduation": yearController.text,
-          "job_role": selectedRoles.join(','),
-          "position_level": selectedPosition ?? "",
-          "work_experience": selectedExperience ?? "",
-          "skills": skills.join(','),
-        },
+      final response = await http.get(
+        Uri.parse('${mainurl}get_skilled_jobs.php'),
       );
-
-      final data = json.decode(response.body);
-
-      _showMessage(data['msg'] ?? "Saved successfully");
-    } catch (e) {
-      _showMessage("Something went wrong");
+      if (response.statusCode == 200) {
+        final jsonBody = json.decode(response.body);
+        if (jsonBody['status'] == true) {
+          final data = jsonBody['data'];
+          if (data is List) {
+            jobs = data
+                .map(
+                  (e) =>
+                      SkilledJob.fromJson(Map<String, dynamic>.from(e as Map)),
+                )
+                .toList();
+          }
+        }
+      }
+    } catch (_) {
+      // ignore
     }
-
-    setState(() => isLoading = false);
+    if (mounted) setState(() => isLoading = false);
   }
 
-  void _showMessage(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
-  }
-
-  // ================= UI =================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Skills & Experience")),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _educationCard(),
-            const SizedBox(height: 20),
-            _jobCard(),
-            const SizedBox(height: 20),
-            _skillCard(),
-            const SizedBox(height: 30),
-            _saveButton(),
-          ],
-        ),
+      backgroundColor: const Color(0xFFF2F5FF),
+      appBar: AppBar(
+        backgroundColor: maincolor,
+        foregroundColor: Colors.white,
+        title: const Text('Skilled Labour Jobs'),
       ),
-    );
-  }
-
-  Widget _educationCard() {
-    return _card(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _sectionTitle(Icons.school, "Education & Qualification"),
-          const SizedBox(height: 12),
-          DropDownTextField(
-            controller: qualificationController,
-            clearOption: false,
-            dropDownList: qualifications,
-            textFieldDecoration: const InputDecoration(
-              border: OutlineInputBorder(),
-            ),
-            onChanged: (val) => qualification = val.name,
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: universityController,
-                  decoration: const InputDecoration(labelText: "University"),
-                ),
-              ),
-              const SizedBox(width: 12),
-              SizedBox(
-                width: 100,
-                child: TextField(
-                  controller: yearController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: "Year"),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _jobCard() {
-    return _card(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _sectionTitle(Icons.work, "Job Role & Experience"),
-          Wrap(
-            spacing: 8,
-            children: jobRoles.map((role) {
-              final selected = selectedRoles.contains(role);
-              return ChoiceChip(
-                label: Text(role),
-                selected: selected,
-                onSelected: (_) {
-                  setState(
-                    () => selected
-                        ? selectedRoles.remove(role)
-                        : selectedRoles.add(role),
+      body: RefreshIndicator(
+        onRefresh: _loadJobs,
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : jobs.isEmpty
+            ? const Center(child: Text('No skilled jobs found'))
+            : ListView.separated(
+                padding: const EdgeInsets.all(16),
+                itemCount: jobs.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  final job = jobs[index];
+                  return Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: ListTile(
+                      title: Text(job.specificSkill),
+                      subtitle: Text('${job.category} • ${job.location}'),
+                      trailing: Text(job.amount.isEmpty ? '-' : job.amount),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => JobDetailsPage(
+                              title: job.specificSkill,
+                              details: {
+                                'Category': job.category,
+                                'Skill': job.specificSkill,
+                                'Description': job.description,
+                                'Location': job.location,
+                                'Amount': job.amount,
+                                'Rate Type': job.rateType,
+                              },
+                              canApply: true,
+                              onApply: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Apply flow not yet implemented',
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   );
                 },
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 8,
-            children: experiences.map((exp) {
-              return ChoiceChip(
-                label: Text(exp),
-                selected: selectedExperience == exp,
-                onSelected: (_) => setState(() => selectedExperience = exp),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 16),
-          DropdownButtonFormField<String>(
-            value: selectedPosition,
-            items: positionLevels
-                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                .toList(),
-            onChanged: (v) => setState(() => selectedPosition = v),
-            decoration: const InputDecoration(labelText: "Position Level"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _skillCard() {
-    return _card(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _sectionTitle(Icons.star, "Skills"),
-          Wrap(
-            spacing: 8,
-            children: skills
-                .map(
-                  (s) => Chip(
-                    label: Text(s),
-                    onDeleted: () => setState(() => skills.remove(s)),
-                  ),
-                )
-                .toList(),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: skillTagController,
-            decoration: InputDecoration(
-              hintText: "Add Skill",
-              suffixIcon: IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () {
-                  if (skillTagController.text.isNotEmpty) {
-                    setState(() {
-                      skills.add(skillTagController.text.trim());
-                      skillTagController.clear();
-                    });
-                  }
-                },
               ),
-            ),
-          ),
-        ],
       ),
-    );
-  }
-
-  Widget _saveButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 52,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : saveSkillInfo,
-        child: isLoading
-            ? const CircularProgressIndicator(color: Colors.white)
-            : const Text("Save Changes"),
-      ),
-    );
-  }
-
-  Widget _card({required Widget child}) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 8)],
-      ),
-      child: child,
-    );
-  }
-
-  Widget _sectionTitle(IconData icon, String title) {
-    return Row(
-      children: [
-        Icon(icon, color: Colors.blue),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-      ],
     );
   }
 }
