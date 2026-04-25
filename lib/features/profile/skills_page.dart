@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:dropdown_textfield/dropdown_textfield.dart';
+import 'package:esearch/core/constants/colors.dart';
 import 'package:esearch/core/constants/urls.dart';
 import 'package:esearch/core/utils/global_user.dart' as globaluser;
 
@@ -167,7 +168,14 @@ class _SkillInfoPageState extends State<SkillInfoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Skills & Experience"),
+        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: maincolor,
+        title: const Text(
+          "Skills & Experience",
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

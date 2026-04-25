@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:esearch/features/profile/basic_info_page.dart';
+import 'package:esearch/features/profile/cv_upload.dart';
 import 'package:esearch/features/profile/skills_page.dart';
 import 'package:esearch/core/constants/colors.dart';
 import 'package:esearch/core/utils/loading.dart';
@@ -442,6 +443,46 @@ class _EditprofileState extends State<Editprofile>
                   context,
                   MaterialPageRoute(
                     builder: (_) => SkillInfoPage(),
+                  ),
+                );
+              },
+            ),
+          ),
+          Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            color: Colors.blue.shade50,
+            child: ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade100,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.attach_file_outlined,
+                  color: Colors.blue,
+                ),
+              ),
+              title: const Text(
+                "CV uploads",
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+              ),
+              trailing: const Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+                color: Colors.blueGrey,
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => CvUpload(),
                   ),
                 );
               },

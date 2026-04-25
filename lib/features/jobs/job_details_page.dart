@@ -23,7 +23,15 @@ class JobDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        iconTheme: IconThemeData(
+          color: Colors.white,
+        ),
+        title: Text(
+          title,
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
         backgroundColor: maincolor,
       ),
       body: SingleChildScrollView(

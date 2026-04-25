@@ -68,6 +68,7 @@ class _CorporateJobsState extends State<CorporateJobs> {
   final TextEditingController _searchController = TextEditingController();
 
   List<CorporateJob> _jobs = [];
+  Set<int> bookmarkedJobs = {};
 
   @override
   void initState() {
@@ -251,9 +252,17 @@ class _CorporateJobsState extends State<CorporateJobs> {
       resizeToAvoidBottomInset: true,
       backgroundColor: const Color(0xFFF2F5FF),
       appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Colors.white,
+        ),
         backgroundColor: maincolor,
         foregroundColor: Colors.white,
-        title: const Text("Corporate Jobs"),
+        title: const Text(
+          "Corporate Jobs",
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
         elevation: 0,
       ),
       body: Padding(
@@ -322,6 +331,7 @@ class _CorporateJobsState extends State<CorporateJobs> {
 
   Widget _jobCard(CorporateJob job, int index) {
     final isMine = job.postedBy == globaluser.user.userid;
+
     return InkWell(
       onTap: () => _openJobDetails(job),
       child: Container(
@@ -345,21 +355,41 @@ class _CorporateJobsState extends State<CorporateJobs> {
                     ),
                   ),
                 ),
+
                 IconButton(
-                  icon: const Icon(Icons.bookmark, color: Colors.blue),
-                  onPressed: () => _deleteJob(index),
+                  icon: Icon(
+                    bookmarkedJobs.contains(job.id)
+                        ? Icons.bookmark
+                        : Icons.bookmark_border,
+                    color: bookmarkedJobs.contains(job.id)
+                        ? Colors.blue
+                        : Colors.grey,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      if (bookmarkedJobs.contains(job.id)) {
+                        bookmarkedJobs.remove(job.id);
+                      } else {
+                        bookmarkedJobs.add(job.id);
+                      }
+                    });
+                  },
                 ),
               ],
             ),
+
             const SizedBox(height: 4),
             Text(job.company, style: const TextStyle(color: Colors.grey)),
+
             const SizedBox(height: 10),
             Text(
               job.salary,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
+
             const SizedBox(height: 6),
             Text(job.location, style: const TextStyle(color: Colors.grey)),
+
             const SizedBox(height: 12),
             Row(
               children: [
@@ -368,6 +398,7 @@ class _CorporateJobsState extends State<CorporateJobs> {
                 Chip(label: Text(job.vacancy)),
               ],
             ),
+
             const SizedBox(height: 12),
             Align(
               alignment: Alignment.centerRight,

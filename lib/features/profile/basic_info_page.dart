@@ -108,11 +108,17 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Colors.white,
+        ),
         centerTitle: true,
         backgroundColor: maincolor,
         foregroundColor: Colors.white,
         title: Text(
           "Basic Info",
+          style: TextStyle(
+            color: Colors.white,
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -128,6 +134,7 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
                   decoration: InputDecoration(
                     prefixIcon: Icon(
                       Icons.email,
+                      color: Colors.blue,
                     ),
                     labelText: "Email",
                     filled: true,
@@ -151,6 +158,7 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
                   decoration: InputDecoration(
                     prefixIcon: Icon(
                       Icons.phone,
+                      color: Colors.blue,
                     ),
                     labelText: "Mobile No",
                     filled: true,
@@ -173,8 +181,9 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
                   decoration: InputDecoration(
                     prefixIcon: Icon(
                       Icons.person,
+                      color: Colors.blue,
                     ),
-                    labelText: "Mobile No",
+                    labelText: "Full Name",
                     filled: true,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -195,7 +204,10 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
                   controller: dob,
                   readOnly: isBasicEdit,
                   decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.calendar_month_outlined),
+                    prefixIcon: Icon(
+                      Icons.calendar_month_outlined,
+                      color: Colors.blue,
+                    ),
                     labelText: "Date of Birth",
                     filled: true,
                     border: OutlineInputBorder(

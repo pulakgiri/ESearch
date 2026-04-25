@@ -240,7 +240,7 @@ class _PostHomebasedJobState extends State<PostHomebasedJob> {
               ),
               child: const Icon(
                 Icons.arrow_back,
-                color: AppTheme.textPrimary,
+                color: Color.fromARGB(255, 255, 255, 255),
                 size: 20,
               ),
             ),

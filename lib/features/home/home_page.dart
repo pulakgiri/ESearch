@@ -25,10 +25,30 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   late SharedPreferences sp;
   RxString user_image = "".obs;
+  final TextEditingController _subtitleController = TextEditingController();
+  bool isEditing = false;
+
   @override
   void initState() {
     user_image.value = globaluser.user.image.toString();
+    _loadSavedSubtitle();
     super.initState();
+  }
+
+  Future<void> _loadSavedSubtitle() async {
+    sp = await SharedPreferences.getInstance();
+    setState(() {
+      _subtitleController.text =
+          sp.getString('user_subtitle') ?? "App Developer";
+    });
+  }
+
+  Future<void> _saveSubtitle(String value) async {
+    sp = await SharedPreferences.getInstance();
+    await sp.setString('user_subtitle', value);
+    setState(() {
+      isEditing = false; // Switch back to text view after saving
+    });
   }
 
   Future<void> _refreshPage() async {
@@ -238,13 +258,30 @@ class _HomeState extends State<Home> {
                   ),
                   maxLines: 1,
                 ),
-                subtitle: AutoSizeText(
-                  "App Developer",
-                  style: TextStyle(
-                    fontSize: 15,
-                  ),
-                  maxLines: 1,
-                ),
+                subtitle: isEditing
+                    ? TextField(
+                        controller: _subtitleController,
+                        autofocus: true,
+                        style: const TextStyle(fontSize: 15),
+                        decoration: const InputDecoration(
+                          isDense: true,
+                          border: UnderlineInputBorder(),
+                        ),
+                        onSubmitted: (value) =>
+                            _saveSubtitle(value), // Save on keyboard "Done"
+                      )
+                    : GestureDetector(
+                        onTap: () =>
+                            setState(() => isEditing = true), // Click to edit
+                        child: AutoSizeText(
+                          _subtitleController.text,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            color: Colors.blueGrey,
+                          ),
+                          maxLines: 1,
+                        ),
+                      ),
                 trailing: ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -591,34 +628,34 @@ class _HomeState extends State<Home> {
                   ),
                 ],
               ),
-              Padding(
-                padding: EdgeInsets.all(6),
-                child: Text(
-                  "Quick Action",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              ListView(
-                shrinkWrap: true,
-                children: [
-                  ListTile(
-                    leading: Icon(Icons.business_center),
-                    title: Text('Software Engineer'),
-                    subtitle: Text('ABC Inc.'),
-                    trailing: ElevatedButton(
-                      onPressed: () {},
-                      // style: ElevatedButton.styleFrom(
-                      //   foregroundBuilder: Colors.cyanAccent,
-                      // ),
-                      child: Text('Apply Now'),
-                    ),
-                  ),
-                ],
-              ),
 
+              // Padding(
+              //   padding: EdgeInsets.all(6),
+              //   child: Text(
+              //     "Quick Action",
+              //     style: TextStyle(
+              //       fontSize: 20,
+              //       fontWeight: FontWeight.bold,
+              //     ),
+              //   ),
+              // ),
+              // ListView(
+              //   shrinkWrap: true,
+              //   children: [
+              //     ListTile(
+              //       leading: Icon(Icons.business_center),
+              //       title: Text('Software Engineer'),
+              //       subtitle: Text('ABC Inc.'),
+              //       trailing: ElevatedButton(
+              //         onPressed: () {},
+              //         // style: ElevatedButton.styleFrom(
+              //         //   foregroundBuilder: Colors.cyanAccent,
+              //         // ),
+              //         child: Text('Apply Now'),
+              //       ),
+              //     ),
+              //   ],
+              // ),
               Padding(
                 padding: EdgeInsets.all(6),
                 child: Text(
